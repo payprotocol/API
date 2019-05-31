@@ -30,7 +30,7 @@ every user(client) must register the certificate after the enrollment.
         "bookmark": "---bookmark string---"
     },
     "records": [
-        // <Something> objects list
+        "---<Something> objects---"
     ]
 }
 ```
