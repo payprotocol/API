@@ -17,12 +17,12 @@
 {
     "@account": "address",
     "token": "token code",
-    "type": <Account Type>,
+    "type": "<Account Type>",
     "created_time": "RFC3339Nano format string",
     "updated_time": "RFC3339Nano format string",
     "suspended_time": "RFC3339Nano format string",
-    "holders": [    // joint account only
-        // <Holder> set
+    "holders": [    "// joint account only"
+        "---<Holder> set---"
     ],
     "balance": {
         "@balance": "account address",
@@ -39,7 +39,7 @@
     "@holder": "KID",
     "address": "address",
     "token": "token code",
-    "type": <Account Type>,
+    "type": "<Account Type>",
     "created_time": "RFC3339Nano format string"
 }
 ```
@@ -56,7 +56,7 @@
 ```json
 {
     "@balance_log": "account address",
-    "type": <BalanceLog Type>,
+    "type": "<BalanceLog Type>",
     "rid": "relative ID - account address or contract ID",
     "diff": "delta value - big int string",
     "amount": "modified balance amount - big int string",
@@ -73,7 +73,7 @@
 ```json
 {
     "@pending_balance": "pending balance ID",
-    "type": <PendingBalance Type>,
+    "type": "<PendingBalance Type>",
     "account": "account address",
     "rid": "relative ID - account address or contract ID",
     "amount": "big int string",
@@ -87,7 +87,7 @@
 ```json
 {
     "@token": "token code",
-    "decimal": 8,   // 0 ~ 18 int
+    "decimal": 8,   "// 0 ~ 18 int"
     "max_supply": "supply max limit - big int string",
     "supply": "current supplied amount - big int string",
     "genesis_account": "genesis account address",
@@ -104,7 +104,7 @@
         "bookmark": "---bookmark string---"
     },
     "records": [
-        // <Something> objects list
+        "---<Something> objects---"
     ]
 }
 ```
