@@ -34,7 +34,7 @@
         "bookmark": "---bookmark string---"
     },
     "records": [
-        // <Something> objects list
+        "---<Something> objects---"
     ]
 }
 ```
