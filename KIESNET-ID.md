@@ -37,33 +37,30 @@ every user(client) must register the certificate after the enrollment.
 
 ## Functions
 
-> query __`get`__ {_"kiesnet-id/pin"_}
+> query __`get`__
 - Get invoker's identity
-- If {_"kiesnet-id/pin"_} is set, PIN validation will be performed; Otherwise, not.
 - response: Identity
 
-> query __`kid`__ [_secure_] {_"kiesnet-id/pin"_}
+> query __`kid`__
 - Get invoker's KID
-- [_secure_] is not empty, PIN validation will be performed.
 - response: KID string
 
-> query __`list`__ [_bookmark_] {_"kiesnet-id/pin"_}
+> query __`list`__ [_bookmark_]
 - Get invoker's certificates list
-- If {_"kiesnet-id/pin"_} is set, PIN validation will be performed; Otherwise, not.
 - response: List\<Certificate>
 
-> invoke __`pin`__ {"kiesnet-id/pin", "kiesnet-id/new_pin"}
-- Update the PIN
-- response: Identity
+> invoke __`lock`__
+- Lock the identity with the invoker's certificate
 
-> invoke __`register`__ {_"kiesnet-id/pin"_}
+> invoke __`register`__
 - Register invoker's certificate
-- If the client user already has PIN, {"kiesnet-id/pin"} is mandatory.
-- response: Identity
 
-> invoke __`revoke`__ [__serial_number__] {"kiesnet-id/pin"}
+> invoke __`revoke`__ [serial_number]
 - Revoke the certificate
-- response: Certificate
+
+> invoke __`unlock`__
+- Unlock the identity with the invoker's certificate
+- The invoker's certificate must be the certificate which was used to lock the identity.
 
 > query __`ver`__
 - Get version

@@ -111,7 +111,7 @@
 
 ## Functions
 
-> invoke __`account/create`__ [__token_code__, _co-holders..._] {_"kiesnet-id/pin"_}
+> invoke __`account/create`__ [__token_code__, _co-holders..._]
 - Create an account
 - [__token_code__] : issued token code (ex, PCI, ETH, BTC ...)
 - [_co-holders..._] : PAOTs (excluding the invoker self, max 127)
@@ -123,13 +123,13 @@
 - If the parameter is token code, it returns the PAOT.
 - response: Account
 
-> invoke __`account/holder/add`__ [__account__, __holder__] {_"kiesnet-id/pin"_}
+> invoke __`account/holder/add`__ [__account__, __holder__]
 - Create a contract to add the holder
 - [account] : the joint account address
 - [holder] : PAOT of the holder to be added
 - response: Contract
 
-> invoke __`account/holder/remove`__ [__account__, __holder__] {_"kiesnet-id/pin"_}
+> invoke __`account/holder/remove`__ [__account__, __holder__]
 - Create a contract to remove the holder
 - [account] : the joint account address
 - [holder] : PAOT of the holder to be removed
@@ -141,11 +141,11 @@
 - [_fetch_size_] : max 200, if it is less than 1, default size will be used (which is 20)
 - response: List\<Holder>
 
-> invoke __`account/suspend`__ [__token_code__] {_"kiesnet-id/pin"_}
+> invoke __`account/suspend`__ [__token_code__]
 - Suspend the PAOT
 - response: Account
 
-> invoke __`account/unsuspend`__ [__token_code__] {_"kiesnet-id/pin"_}
+> invoke __`account/unsuspend`__ [__token_code__]
 - Unsuspend the PAOT
 - response: Account
 
@@ -169,7 +169,7 @@
 - [_fetch_size_] : max 200, if it is less than 1, default size will be used (which is 20)
 - response: List\<PendingBalance>
 
-> invoke __`balance/pending/withdraw`__ [__pending_balance_id__] {_"kiesnet-id/pin"_}
+> invoke __`balance/pending/withdraw`__ [__pending_balance_id__]
 - Withdraw the balance
 - response: BalanceLog
 
@@ -177,7 +177,7 @@
 - Get the current state of the token
 - response: Token
 
-> invoke __`transfer`__ [__sender__, __receiver__, __amount__, _memo_, _pending_time_, _expiry_, _extra-signers..._] {_"kiesnet-id/pin"_}
+> invoke __`transfer`__ [__sender__, __receiver__, __amount__, _memo_, _pending_time_, _expiry_, _extra-signers..._]
 - Transfer the amount of the token or create a contract
 - [__sender__] : an account address, __empty = PAOT__
 - [__receiver__] : an account address

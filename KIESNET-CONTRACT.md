@@ -41,12 +41,12 @@
 
 ## Functions
 
-> invoke __`approve`__ [__contract_id__] {_"kiesnet-id/pin"_}
+> invoke __`approve`__ [__contract_id__]
 - Approve the contract
 - If all signers have approved the contract, it invokes 'contract/execute' callback.
 - response: Contract
 
-> invoke __`disapprove`__ [__contract_id__] {_"kiesnet-id/pin"_}
+> invoke __`disapprove`__ [__contract_id__]
 - Disapprove the contract
 - It invokes 'contract/cancel' callback.
 - response: Contract
