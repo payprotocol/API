@@ -22,6 +22,14 @@ every user(client) must register the certificate after the enrollment.
 }
 ```
 
+> KID
+```json
+{
+    "@kid": "KID of the user(client)",
+    "lock": "serial number of the certificate (omitempty)"
+}
+```
+
 > List\<Something>
 ```json
 {
@@ -51,16 +59,20 @@ every user(client) must register the certificate after the enrollment.
 
 > invoke __`lock`__
 - Lock the identity with the invoker's certificate
+- response: KID
 
 > invoke __`register`__
 - Register invoker's certificate
+- response: Identity
 
 > invoke __`revoke`__ [serial_number]
 - Revoke the certificate
+- response: Certificate
 
 > invoke __`unlock`__
 - Unlock the identity with the invoker's certificate
 - The invoker's certificate must be the certificate which was used to lock the identity.
+- response: KID
 
 > query __`ver`__
 - Get version
