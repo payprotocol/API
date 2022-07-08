@@ -4,6 +4,18 @@
 ## Terms
 
 - PAOT : personal(main) account of the token
+- EOA : Externally Owned Accounts
+
+## API
+
+method **`func`** [arg1, _arg2_, ... ] {trs1, _trs2_, ... }
+
+- method : **query** or **invoke**
+- func : function name
+- [arg] : mandatory argument
+- [_arg_] : optional argument
+- {trs} : mandatory transient
+- {_trs_} : optional transient
 
 ## Response objects
 
@@ -44,6 +56,17 @@
 }
 ```
 
+> Balance
+```json
+{
+  "@balance": "account address",
+  "amount": "big int string",
+  "created_time": "RFC3339Nano format string",
+  "updated_time": "RFC3339Nano format string",
+  "last_pruned_pay_id": "last pruned pay id"    "// used for pay balance only"
+}
+```
+
 > BalanceLog Type (int)
 - 0x00 : mint
 - 0x01 : burn
@@ -51,17 +74,32 @@
 - 0x03 : receive
 - 0x04 : deposit (create a pending balance)
 - 0x05 : withdraw (from the pending balance)
+- 0x06 : pay
+- 0x07 : refund
+- 0x08 : prune pay
+- 0x09 : prune fee
+- 0x0a : wrap
+- 0x0b : unwrap
+- 0x0c : wrap complete
+- 0x0d : unwrap complete
 
 > BalanceLog
 ```json
 {
-    "@balance_log": "account address",
-    "type": "<BalanceLog Type>",
-    "rid": "relative ID - account address or contract ID",
-    "diff": "delta value - big int string",
-    "amount": "modified balance amount - big int string",
-    "memo": "memo (length limit 1024)",
-    "created_time": "RFC3339Nano format string"
+  "@balance_log": "account address",
+  "type": "<BalanceLog Type>",
+  "rid": "relative ID - account address or contract ID",
+  "diff": "delta value - big int string",
+  "amount": "modified balance amount - big int string",
+  "fee": "fee - big int string",
+  "memo": "memo (length limit 1024)",
+  "created_time": "RFC3339Nano format string",
+  "prune_start_id": "prune start ID",    "// used for pruned balance log only" 
+  "prune_end_id": "prune end ID",    "// used for pruned balance log only"
+  "pay_id": "pay ID",    "// used for pay balance log only"
+  "order_id": "order ID",    "// vendor specific unique identifier"
+  "ext_code": "external token code",    "// used for wrap, unwrap balance log only"
+  "ext_tx_id": "external transaction id"    "// used for unwrap, wrap/complete balance log only"
 }
 ```
 
@@ -72,27 +110,58 @@
 > PendingBalance
 ```json
 {
-    "@pending_balance": "pending balance ID",
-    "type": "<PendingBalance Type>",
-    "account": "account address",
-    "rid": "relative ID - account address or contract ID",
-    "amount": "big int string",
-    "memo": "memo (length limit 1024)",
-    "created_time": "RFC3339Nano format string",
-    "pending_time": "RFC3339Nano format string"
+  "@pending_balance": "pending balance ID",
+  "type": "<PendingBalance Type>",
+  "account": "account address",
+  "rid": "relative ID - account address or contract ID",
+  "amount": "big int string",
+  "fee": "fee - big int string",
+  "memo": "memo (length limit 1024)",
+  "created_time": "RFC3339Nano format string",
+  "pending_time": "RFC3339Nano format string",
+  "order_id": "order ID",    "// vendor specific unique identifier"
 }
 ```
 
 > Token
 ```json
 {
-    "@token": "token code",
-    "decimal": 8,   "// 0 ~ 18 int"
-    "max_supply": "supply max limit - big int string",
-    "supply": "current supplied amount - big int string",
-    "genesis_account": "genesis account address",
-    "created_time": "RFC3339Nano format string",
-    "updated_time": "RFC3339Nano format string"
+  "@token": "token code",
+  "decimal": 8,    "// 0 ~ 18 int"
+  "max_supply": "supply max limit - big int string",
+  "supply": "current supplied amount - big int string",
+  "genesis_account": "genesis account address",
+  "fee_policy": "<FeePolicy>",
+  "wrap_bridge": "<WrapBridge>",
+  "created_time": "RFC3339Nano format string",
+  "updated_time": "RFC3339Nano format string"
+}
+```
+
+> FeePolicy
+```json
+{
+  "target_address": "account address receiving fee",
+  "rates": {
+    "pay": {
+      "rate": "fee rate of pay",
+      "max_amount": "max fee amount of pay"    "// 0 is unlimit"
+    },
+    "transfer": {
+      "rate": "fee rate of transfer",
+      "max_amount": "max fee amount of transfer"    "// 0 is unlimit"
+    }
+  }
+}
+```
+
+> WrapBridge
+```json
+{
+  "token code": {    "// external token code"
+    "ext_chain": "external blockchain",    "// external blockchain"
+    "wrap_address":"account address for wpci bridge"
+  }
 }
 ```
 
@@ -111,82 +180,84 @@
 
 ## Functions
 
-> invoke __`account/create`__ [__token_code__, _co-holders..._]
+> invoke **`account/create`** [__token_code__, _co-holders..._]
+### Need to add response for option value
 - Create an account
 - [__token_code__] : issued token code (ex, PCI, ETH, BTC ...)
 - [_co-holders..._] : PAOTs (excluding the invoker self, max 127)
 - If holders(include invoker) are more than 1, it creates a joint account. If not, it creates the PAOT.
-- response: Account or Contract(joint account)
+- response: `Account or Contract(joint account)`
 
-> query __`account/get`__ [__token_code|address__]
+> query **`account/get`** [__token_code|address__]
 - Get the account
 - If the parameter is token code, it returns the PAOT.
-- response: Account
+- response: `Account`
 
-> invoke __`account/holder/add`__ [__account__, __holder__]
+> invoke **`account/holder/add`** [__account__, __holder__]
 - Create a contract to add the holder
 - [account] : the joint account address
 - [holder] : PAOT of the holder to be added
-- response: Contract
+- response: `Contract`
 
-> invoke __`account/holder/remove`__ [__account__, __holder__]
+> invoke **`account/holder/remove`** [__account__, __holder__]
 - Create a contract to remove the holder
 - [account] : the joint account address
 - [holder] : PAOT of the holder to be removed
-- response: Contract
+- response: `Contract`
 
-> query __`account/list`__ [__token_code__, _bookmark_, _fetch_size_]
+> query **`account/list`** [__token_code__, _bookmark_, _fetch_size_]
 - Get account list
 - If token_code is empty, it returns all accounts regardless of the tokens.
 - [_fetch_size_] : max 200, if it is less than 1, default size will be used (which is 20)
-- response: List\<Holder>
+- response: `List\<Holder>`
 
-> invoke __`account/suspend`__ [__token_code__]
+> invoke **`account/suspend`** [__token_code__]
 - Suspend the PAOT
-- response: Account
+- response: `Account`
 
-> invoke __`account/unsuspend`__ [__token_code__]
+> invoke **`account/unsuspend`** [__token_code__]
 - Unsuspend the PAOT
-- response: Account
+- response: `Account`
 
-> query __`balance/logs`__ [__token_code|address__, _log_type_, _bookmark_, _fetch_size_, _starttime_, _endtime_]
+> query **`balance/logs`** [__token_code|address__, _log_type_, _bookmark_, _fetch_size_, _starttime_, _endtime_]
 - Get balance logs
 - [__token_code|address__] : If it is token code, it returns logs of the PAOT.
 - [_log_type_] : \<BalanceLog Type>
 - [_fetch_size_] : max 200, if it is less than 1, the default size will be used (which is 20)
-- [_starttime_] : __time(seconds)__ represented by int64
-- [_endtime_] : __time(seconds)__ represented by int64
-- response: List\<BalanceLog>
+- [_starttime_] : **time(seconds)** represented by int64
+- [_endtime_] : **time(seconds)** represented by int64
+- response: `List\<BalanceLog>`
 
-> query __`balance/pending/get`__ [__pending_balance_id__]
+> query **`balance/pending/get`** [__pending_balance_id__]
 - Get the pending balance
-- response: PendingBalance
+- response: `PendingBalance`
 
-> query __`balance/pending/list`__ [__token_code|address__, _sort_, _bookmark_, _fetch_size_]
+> query **`balance/pending/list`** [__token_code|address__, _sort_, _bookmark_, _fetch_size_]
 - Get pending balances list
 - [__token_code|address__] : If it is token code, it returns logs of the PAOT.
 - [_sort_] : 'created_time' or 'pending_time'(default)
 - [_fetch_size_] : max 200, if it is less than 1, default size will be used (which is 20)
-- response: List\<PendingBalance>
+- response: `List\<PendingBalance>`
 
-> invoke __`balance/pending/withdraw`__ [__pending_balance_id__]
+> invoke **`balance/pending/withdraw`** [__pending_balance_id__]
 - Withdraw the balance
-- response: BalanceLog
+- response: `BalanceLog`
 
-> query __`token/get`__ [__token_code__]
+> query **`token/get`** [__token_code__]
 - Get the current state of the token
-- response: Token
+- response: `Token`
 
-> invoke __`transfer`__ [__sender__, __receiver__, __amount__, _memo_, _pending_time_, _expiry_, _extra-signers..._]
+> invoke **`transfer`** [__sender__, __receiver__, __amount__, _memo_, _order_id_, _pending_time_, _expiry_, _extra-signers..._]
 - Transfer the amount of the token or create a contract
-- [__sender__] : an account address, __empty = PAOT__
+- [__sender__] : an account address, **empty = PAOT**
 - [__receiver__] : an account address
 - [__amount__] : an amount to transfer (big int string)
 - [_memo_] : max 1024 charactors
-- [_pending_time_] : __time(seconds)__ represented by int64
-- [_expiry_] : __duration(seconds)__ represented by int64, multi-sig only
+- [_order_id_] : order ID (vendor specific)
+- [_pending_time_] : **time(seconds)** represented by int64
+- [_expiry_] : **duration(seconds)** represented by int64, multi-sig only
 - [_extra-signers..._] : PAOTs (excluding the invoker self, max 127)
-- response: BalanceLog
+- response: `BalanceLog`
 
-> query __`ver`__
+> query **`ver`**
 - Get version
